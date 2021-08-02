@@ -35,7 +35,8 @@ router.post('/userLogin', async function (req, res) {
     const { user_name, password } = req.body;
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
-    try {
+    return res.json({ "status": false
+   /* try {
         await client.connect()
 
 
@@ -60,7 +61,7 @@ router.post('/userLogin', async function (req, res) {
     } catch (e) {
         console.log(e)
         return res.json({ "status": false })
-    }
+    }*/
 })
 
 // Create users
