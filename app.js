@@ -34,7 +34,7 @@ app.use('/Comments',comments)
 app.use('/underChallenges',underChallenges)
 app.use("/Notifications", notifications)
 var env = process.env.NODE_ENV || 'development';
-if(env !== 'development'){
+if(env == 'development'){
   console.log("TEST")
   global.credentials = {
     "user": "postgres",
