@@ -1,11 +1,11 @@
 function getCredentials() {
-    const obj = {
+  /*  const obj = {
         "user": "postgres",
         "host": "localhost",
         "database": "postgres",
         "password": "Nordural050196",
         "port": 5432
-    };
+    };*/
     return obj;
     /* const obj = {
        "user":"drejoxqksziety",
