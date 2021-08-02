@@ -33,8 +33,7 @@ async function registerUser(req) {
 //Login returns status strue if user may login
 router.post('/userLogin', async function (req, res) {
     const { user_name, password } = req.body;
-    return res.json({ "user": user, "status": true })
-    /*const cred = global.credentials
+    const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
     const query = "Select id,name,user_name,password,email,country,age,image_url,description,gender from users Where user_name = $1 and password = $2";
@@ -54,7 +53,7 @@ router.post('/userLogin', async function (req, res) {
         return res.json({ "user": user, "status": true })
     } else {
         return res.json({ "status": false })
-    }*/
+    }
 })
 
 // Create users
