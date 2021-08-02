@@ -34,7 +34,7 @@ async function registerUser(req) {
 router.post('/userLogin', async function (req, res) {
     const { user_name, password } = req.body;
     const cred = global.credentials
-    const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
+    const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432,ssl:{rejectUnauthorized:false} });
     await client.connect()
     return res.json({ "status": false })
     /*
