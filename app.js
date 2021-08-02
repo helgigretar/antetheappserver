@@ -34,7 +34,7 @@ app.use('/Comments',comments)
 app.use('/underChallenges',underChallenges)
 app.use("/Notifications", notifications)
 var env = process.env.NODE_ENV || 'development';
-if(env === 'development'){
+if(env !== 'development'){
   console.log("TEST")
   global.credentials = {
     "user": "postgres",
@@ -43,13 +43,14 @@ if(env === 'development'){
     "password": "Nordural050196",
     "port": 5432
   };
-
+  
 }else{
+  console.log("PROD")
   global.credentials = {
-    "user":"drejoxqksziety",
-    "host":"ec2-54-195-247-108.eu-west-1.compute.amazonaws.com",
-    "database":"d711qi31b5sskh",
-    "password":"c1d0a5ba1ad75f9e465c78ea4222e2f5c83fda8184415a77e38100ce5feac47c",
+    "user":"ejsubzyduhgpdv",
+    "host":"ec2-54-216-17-9.eu-west-1.compute.amazonaws.com",
+    "database":"d19fbfap80505j",
+    "password":"4837c58350fe4ced948efaa92809b8eee0b3935f27fda3e3b6972a8e3663427e",
     "port":5432
   };
 
