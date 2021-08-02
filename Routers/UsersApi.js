@@ -35,7 +35,7 @@ router.post('/userLogin', async function (req, res) {
     const { user_name, password } = req.body;
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
-    return res.json({ "status": false
+    return res.json({ "status": client});
    /* try {
         await client.connect()
 
