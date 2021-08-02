@@ -35,28 +35,30 @@ router.post('/userLogin', async function (req, res) {
     const { user_name, password } = req.body;
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
-    try{
+    try {
         await client.connect()
-        
-    }catch(e){
-        console.log(e)
-    }
-    const query = "Select id,name,user_name,password,email,country,age,image_url,description,gender from users Where user_name = $1 and password = $2";
-    let values = [];
-    values.push(user_name) //Name = 1
-    values.push(password) // password =2
-    const result = await client.query(query, values)
-    client.end();
-    let authStatus = false;
-    const data = result.rows
-    if (data.length === 1) {
-        data.authStatus = false;
-        const user = {
-            "id":data[0].id,"name":data[0].name,"user_name":data[0].password, "email":data[0].email,"country":data[0].country,"age":data[0].age,
-            "image_url":data[0].image_url,"description":data[0].description,"gender":data[0].gender
+
+
+        const query = "Select id,name,user_name,password,email,country,age,image_url,description,gender from users Where user_name = $1 and password = $2";
+        let values = [];
+        values.push(user_name) //Name = 1
+        values.push(password) // password =2
+        const result = await client.query(query, values)
+        client.end();
+        let authStatus = false;
+        const data = result.rows
+        if (data.length === 1) {
+            data.authStatus = false;
+            const user = {
+                "id": data[0].id, "name": data[0].name, "user_name": data[0].password, "email": data[0].email, "country": data[0].country, "age": data[0].age,
+                "image_url": data[0].image_url, "description": data[0].description, "gender": data[0].gender
+            }
+            return res.json({ "user": user, "status": true })
+        } else {
+            return res.json({ "status": false })
         }
-        return res.json({ "user": user, "status": true })
-    } else {
+    } catch (e) {
+        console.log(e)
         return res.json({ "status": false })
     }
 })
@@ -99,26 +101,26 @@ async function getLastsUserId() {
     return result.rows[0].id
 }
 router.get("/getUserByUserId/:user_id", async function (req, res) {
-    const  user_id  = req.params.user_id
+    const user_id = req.params.user_id
     const user = {}
-    await GetUserByUserId(user_id).then(res=>{
+    await GetUserByUserId(user_id).then(res => {
         user.id = res[0].id;
         user.name = res[0].name;
         user.image_url = res[0].image_url;
         user.description = res[0].description
         user.friends = res[0].friends;
         user.points = res[0].points;
-        user.challenges= res[0].challenges;
+        user.challenges = res[0].challenges;
         user.won = res[0].won;
         user.did_not_pay = res[0].user_did_not_pay
     })
-    await GetUsersRankingByUserID(user_id).then(res=>{
-        user.ranking= res;
-    })    
+    await GetUsersRankingByUserID(user_id).then(res => {
+        user.ranking = res;
+    })
     res.json({ "user": user })
 })
 //Get user information by its user_id
-async function GetUserByUserId(user_id){
+async function GetUserByUserId(user_id) {
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
@@ -138,32 +140,32 @@ async function GetUserByUserId(user_id){
     const values = [user_id];
     const result = await client.query(query, values)
     client.end();
-   return result.rows;
+    return result.rows;
 }
 //get users Rangking by user id for league one
-async function GetUsersRankingByUserID(user_id){
+async function GetUsersRankingByUserID(user_id) {
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
-    const query = "Select user_id,points from users_score order by points desc";    
+    const query = "Select user_id,points from users_score order by points desc";
     const result = await client.query(query)
     client.end();
     client.end();
     let count = 1;
     let finalCount = 0;
-    result.rows.forEach(row=>{
+    result.rows.forEach(row => {
         console.log(row.user_id, user_id)
-        if(row.user_id.toString() === user_id.toString()){
-            finalCount =  count;            
+        if (row.user_id.toString() === user_id.toString()) {
+            finalCount = count;
         }
-        count +=1;
+        count += 1;
     })
-   return finalCount
+    return finalCount
 }
 //Edit user. me information
 router.put("/changeUsersDescriptionAndName/:user_id", async function (req, res) {
-    const user_id  = req.params.user_id
-    const { description, name,email,gender,country } = req.body;
+    const user_id = req.params.user_id
+    const { description, name, email, gender, country } = req.body;
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
@@ -181,7 +183,7 @@ router.put("/changeUsersDescriptionAndName/:user_id", async function (req, res) 
 })
 //edit user. me image
 router.put("/changeUsesImageByUserId/:user_id", async function (req, res) {
-    const user_id  = req.params.user_id
+    const user_id = req.params.user_id
     const { image_url } = req.body;
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
@@ -194,8 +196,8 @@ router.put("/changeUsesImageByUserId/:user_id", async function (req, res) {
     client.end();
     res.json({ "status": true })
 })
-router.get("/test",async function(req,res){
-    res.json({"status":"test"})
+router.get("/test", async function (req, res) {
+    res.json({ "status": "test" })
 })
 
 module.exports = router
