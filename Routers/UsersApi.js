@@ -34,7 +34,8 @@ async function registerUser(req) {
 router.post('/userLogin', async function (req, res) {
     const { user_name, password } = req.body;
     const cred = global.credentials
-    const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432,ssl:{rejectUnauthorized:false} });
+    //const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432,ssl:{rejectUnauthorized:false} });
+    const client = new Client({connectionString="postgres://ejsubzyduhgpdv:4837c58350fe4ced948efaa92809b8eee0b3935f27fda3e3b6972a8e3663427e@ec2-54-216-17-9.eu-west-1.compute.amazonaws.com:5432/d19fbfap80505j"})
     await client.connect()
     return res.json({ "status": false })
     /*
