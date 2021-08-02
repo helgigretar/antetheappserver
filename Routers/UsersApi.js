@@ -35,7 +35,12 @@ router.post('/userLogin', async function (req, res) {
     const { user_name, password } = req.body;
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
-    await client.connect()
+    try{
+        await client.connect()
+        
+    }catch(e){
+        console.log(e)
+    }
     const query = "Select id,name,user_name,password,email,country,age,image_url,description,gender from users Where user_name = $1 and password = $2";
     let values = [];
     values.push(user_name) //Name = 1
