@@ -96,7 +96,7 @@ async function AddInvestor(chosen_winner_user_id,challenge_id,user_id){
     client.end();
     return   
 } 
-router.delete("/DeleteExcistingRow", async function (req, res) {
+router.delete("/removeChallengeInvestor", async function (req, res) {
     const {challenge_id,user_id} =req.body
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
