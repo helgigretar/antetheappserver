@@ -30,7 +30,7 @@ router.get("/getAllUsersRankingbyLeagueId/:league_id", async function (req, res)
     let values = [id];    
     const result = await client.query(query, values)
     client.end();
-    res.json(result.rows)    
+    res.json({data:result.rows,status:true, message:"LeaderBoard data returned"})    
 })
 
 module.exports = router

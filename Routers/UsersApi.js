@@ -34,20 +34,13 @@ async function registerUser(req) {
 router.post('/userLogin', async function (req, res) {
     const { user_name, password } = req.body;
     const cred = global.credentials
-    //const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432,ssl:{rejectUnauthorized:false} });
-    const client = new Client(
-        {
-            connectionString: process.env.DATABASE_URL,
-            ssl: { rejectUnauthorized: false }
-        }
-    )
-    await client.connect()
-    return res.json({ "status": false })
-    /*
+    const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     const query = "Select id,name,user_name,password,email,country,age,image_url,description,gender from users Where user_name = $1 and password = $2";
+    await client.connect()
     let values = [];
     values.push(user_name) //Name = 1
     values.push(password) // password =2
+    console.log(user_name,password)
     const result = await client.query(query, values)
     client.end();
     let authStatus = false;
@@ -58,10 +51,10 @@ router.post('/userLogin', async function (req, res) {
             "id":data[0].id,"name":data[0].name,"user_name":data[0].password, "email":data[0].email,"country":data[0].country,"age":data[0].age,
             "image_url":data[0].image_url,"description":data[0].description,"gender":data[0].gender
         }
-        return res.json({ "user": user, "status": true })
+        return res.json({ "data": user, "status": true })
     } else {
-        return res.json({ "status": false })
-    }*/
+        return res.json({ "status": false,message:"incorrect credentials" })
+    }
 })
 
 // Create users
@@ -118,8 +111,9 @@ router.get("/getUserByUserId/:user_id", async function (req, res) {
     await GetUsersRankingByUserID(user_id).then(res => {
         user.ranking = res;
     })
-    res.json({ "user": user })
+    return res.json({ "data": user,status:true, message:"user information" })
 })
+//status:true, message:"Return user information" 
 //Get user information by its user_id
 async function GetUserByUserId(user_id) {
     const cred = global.credentials

@@ -15,7 +15,7 @@ router.post("/addChallengeInvestor", async function (req, res) {
     let userModifieing =false;
     try{
         //Since I am using a cheap shit I have to have a try right here
-        await IsUserAllowedToAddInvestors(user_id,challenge_id).then(res=>{
+        await IsUserAllowedToAddInvestors(user_id,challenge_id,chosen_winner_user_id).then(res=>{
             allowedToCreate = res
         })
         if(allowedToCreate===true){
@@ -23,24 +23,24 @@ router.post("/addChallengeInvestor", async function (req, res) {
             await IsUserModifieing(challenge_id,user_id).then(res=>{
                 userModifieing =res
             })
-            console.log(userModifieing, " jsjsjjjs ")
             if(userModifieing ===false){
                 //Mod
                 await UpdateExistingChallengeInvestor(chosen_winner_user_id,challenge_id,user_id)
-                res.json({"status":"Modified existing challenge investor",allowed:true})    
+                res.json({"message":"Modified existing challenge investor",status:true})    
             }else{
                 //Create
                 await AddInvestor(chosen_winner_user_id,challenge_id,user_id)
-                res.json({"status":"Added a new challenge investor.",allowed:true})    
+                res.json({"message":"Added a new challenge investor.",status:true})    
             }
         }else{
-            return res.json({"status":"user is not alllowed to invest on his own challenge",allowed:false})
+            return res.json({"message":"user is not alllowed to invest on his own challenge",status:false})
         }    
     }catch{
-    res.json({status:"To many connections",allowed:false})
+    res.json({message:"To many connections",status:false})
     }
 })
-async function IsUserAllowedToAddInvestors(user_id,challenge_id){
+async function IsUserAllowedToAddInvestors(user_id,challenge_id,chosen_winner_user_id){
+    //FIX later chosen winner user id has to be in this challenge
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect();

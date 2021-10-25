@@ -22,25 +22,26 @@ const StoryChallenges = require('./Routers/StoryChallenges')
 const comments = require('./Routers/CommentsApi')
 const underChallenges = require('./Routers/UnderChallengesApi')
 const notifications = require('./Routers/NotificationsApi');
+var cors = require('cors');
 const { table } = require('console');
 
-let db;
-if(process.env.NODE_ENV === "production"){
-  db= new Client({
-    connectionString:process.env.DATABASE_URL,
-    ssl:{
-      rejectUnauthorized:false
-    }
-  })
-}
-db.connect();
-app.get("/", (req,res)=>{
-  db.query("Select * from users;")
-    .then(table=>res.json({data:table.rows}))
-    .catch(err=>res.json(err))
 
-})
-/*
+const corsOpts = {
+  origin: '*',
+
+  methods: [
+    'GET',
+    'POST',
+  ],
+
+  allowedHeaders: [
+    'Content-Type',
+  ],
+};
+
+app.use(cors(corsOpts));
+
+
 //Here are the home routes
 app.use('/Users',users)
 app.use('/Friends',friends)
@@ -73,5 +74,4 @@ if(env == 'development'){
   };
 
 }
- */
 app.listen(port, () => console.log(`url-shortener listening on port ${port}!`));

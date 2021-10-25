@@ -11,17 +11,17 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 router.post("/createChallenge", async function (req, res) {
-    let challenge_id =0;
+    let challenge_id = 0;
     await CreateChallenge(req.body)
-    await GetChallengeLastId().then(res=>{
-        challenge_id=res
+    await GetChallengeLastId().then(res => {
+        challenge_id = res
     })
     const msg = "You got a new challenge ! " + req.body.name + " Do you want to accept ? ";
     await CreateNewNotficationsRow(challenge_id, msg, req.body.challengee_user_id, req.body.challenger_user_id, "CREATE")
     res.json({ "status": "created" })
 })
 //Create new row for the notifications table
-async function CreateNewNotficationsRow(challenge_id,message,receive_user_id, send_user_id,type){
+async function CreateNewNotficationsRow(challenge_id, message, receive_user_id, send_user_id, type) {
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
@@ -40,7 +40,7 @@ async function CreateNewNotficationsRow(challenge_id,message,receive_user_id, se
     return
 }
 //Get the latest challenge id
-async function GetChallengeLastId(){
+async function GetChallengeLastId() {
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
@@ -52,7 +52,7 @@ async function GetChallengeLastId(){
     return result.rows[0].id
 }
 //Creta a new challenge
-async function CreateChallenge(body){
+async function CreateChallenge(body) {
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
@@ -125,7 +125,7 @@ router.get("/getChallengesByUserId/:user_id", async function (req, res) {
     await GetingChallengeInfoFromQuery(query, values).then(res => {
         data = res
     })
-    res.json(data)
+    res.json({data:data, status:true, message:"challenges by user id"})
 })
 router.get("/getChallengeByChallengeId/:challenge_id/:user_id", async function (req, res) {
     const challenge_id = req.params.challenge_id
@@ -228,7 +228,7 @@ router.get("/getAllChallenges/:user_id", async function (req, res) {
     await GetingChallengeInfoFromQuery(query, values).then(res => {
         data = res
     })
-    res.json(data)
+    res.json({ data: data, status: true, message: "All challenges by user returned" })
 })
 async function GetingChallengeInfoFromQuery(query, values) {
     const cred = global.credentials
@@ -252,10 +252,10 @@ async function GetingChallengeInfoFromQuery(query, values) {
             finished_date = HowLongAgo(finished_date);
         }
         const storyChallenges = []
-        storyChallenges.push({ "image_url":row.image_url, "header": "","id":null})
+        storyChallenges.push({ "image_url": row.image_url, "header": "", "id": null })
         if (row.story_images !== null) {
             for (let i = 0; i < row.story_images.length; i++) {
-                storyChallenges.push({ "image_url": row.story_images[i], "header": row.story_headers[i],"id":row.story_id[i] })
+                storyChallenges.push({ "image_url": row.story_images[i], "header": row.story_headers[i], "id": row.story_id[i] })
             }
         }
         data.push({
@@ -272,7 +272,7 @@ async function GetingChallengeInfoFromQuery(query, values) {
             "challenge_investors_for_challengee": row.challenge_investors_for_challengee,
             "challengee_investor_color": HasUserInvestedInChallenge(row.challengee_investor_color),
             "created_date": created_date, "finished_date": finished_date,
-            "terms": row.terms, "prize": row.prize,"end_date":row.end_date
+            "terms": row.terms, "prize": row.prize, "end_date": row.end_date
         })
     })
     return data;
@@ -283,6 +283,8 @@ function GetRightStatusColor(txt) {
             return "orange";
         case "On going":
             return "blue";
+        case "Declined":
+            return "red";
         default:
             return "green";
     }
@@ -347,43 +349,43 @@ function HowLongAgo(setDate) {
         return years <= 1 ? "one year ago" : years + " years ago";
     }
 }
-router.put("/AcceptChallenge", async function (req,res){
-    const { id,challenger_user_id,challengee_user_id} = req.body
+router.put("/AcceptChallenge", async function (req, res) {
+    const { id, challenger_user_id, challengee_user_id } = req.body
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
     const query = `update challenges set accepted_date = NOW(), last_modified_date = NOW(),status='On going' WHERE id = $1`
-    const values=[id]
+    const values = [id]
     const result = await client.query(query, values)
     client.end();
     //Challenger fær svar til baka um að hans challenge hafi verið samþykkt
-    let {challenge_name,user_name} = ""
-    await GetChallengeeName(id).then(res=>{
-        challenge_name= res.rows[0].challenge_name
+    let { challenge_name, user_name } = ""
+    await GetChallengeeName(id).then(res => {
+        challenge_name = res.rows[0].challenge_name
         user_name = res.rows[0].user_name
     })
-    let msg = "Your challenge " + challenge_name + " has been accepted by " + user_name;   
-    await CreateNewNotficationsRow(id,msg,challenger_user_id,challengee_user_id,"ACCEPT")
-    await ConfirmingNotificationAction(id,"CREATE")
+    let msg = "Your challenge " + challenge_name + " has been accepted by " + user_name;
+    await CreateNewNotficationsRow(id, msg, challenger_user_id, challengee_user_id, "ACCEPT")
+    await ConfirmingNotificationAction(id, "CREATE")
     res.json({ "status": "created" })
 })
-async function ConfirmingNotificationAction(challenge_id,status){
+async function ConfirmingNotificationAction(challenge_id, status) {
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
-    const query =`
+    const query = `
     Update notifications set action_commited = true, action_commited_date=NOW() Where challenge_id = $1 AND type = $2;
     `
-    const values=[challenge_id,status]
+    const values = [challenge_id, status]
     const result = await client.query(query, values)
     client.end();
     return result
 }
-async function GetChallengeeName(challenge_id){
+async function GetChallengeeName(challenge_id) {
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
-    const query =`
+    const query = `
     Select 
         challenges.name as challenge_name,            
         users.name as user_name   
@@ -391,16 +393,16 @@ async function GetChallengeeName(challenge_id){
     INNER JOIN users
         on challenges.challengee_user_id = users.id
     Where challenges.id = $1`
-    const values=[challenge_id]
+    const values = [challenge_id]
     const result = await client.query(query, values)
     client.end();
     return result
 }
-async function GetChallengerName(challenge_id){
+async function GetChallengerName(challenge_id) {
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
-    const query =`
+    const query = `
     Select 
         challenges.name as challenge_name,            
         users.name as user_name   
@@ -408,113 +410,113 @@ async function GetChallengerName(challenge_id){
     INNER JOIN users
         on challenges.challenger_user_id = users.id
     Where challenges.id = $1`
-    const values=[challenge_id]
+    const values = [challenge_id]
     const result = await client.query(query, values)
     client.end();
     return result
 }
-router.put("/finishChallenge", async function(req,res){
-    const {id,winner_user_id,challenger_user_id,challengee_user_id}=req.body
+router.put("/finishChallenge", async function (req, res) {
+    const { id, winner_user_id, challenger_user_id, challengee_user_id } = req.body
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
-    const query =`
+    const query = `
         update challenges set finished_date = NOW(),status='Finished', last_modified_date = NOW(),winner_user_id = $2 WHERE id = $1
     `
-    const values=[id,winner_user_id]
+    const values = [id, winner_user_id]
     const result = await client.query(query, values)
     client.end();
-    let {challenge_name,user_name} = ""
-    await GetChallengerName(id).then(res=>{
-        challenge_name= res.rows[0].challenge_name
+    let { challenge_name, user_name } = ""
+    await GetChallengerName(id).then(res => {
+        challenge_name = res.rows[0].challenge_name
         user_name = res.rows[0].user_name
     })
     let message = "Your challenge on " + challenge_name + " has finished and the winner is " + user_name
-    await CreateNewNotficationsRow(id,message,challengee_user_id,challenger_user_id,"FINISH");
-    await ConfirmingNotificationAction(id,"START")
-    return res.json({"status":"finished challenge"})
+    await CreateNewNotficationsRow(id, message, challengee_user_id, challenger_user_id, "FINISH");
+    await ConfirmingNotificationAction(id, "START")
+    return res.json({ "status": "finished challenge" })
 })
-router.put("/StartChallengebyChallengeId", async function(req,res){
-    const {id,challengee_user_id,challenger_user_id} =req.body
+router.put("/StartChallengebyChallengeId", async function (req, res) {
+    const { id, challengee_user_id, challenger_user_id } = req.body
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
     const query = `
         update challenges set status = 'On going', last_modified_date = NOW() WHERE id = $1
     `
-    const values=[id]
+    const values = [id]
     const result = await client.query(query, values)
     client.end();
-    let {challenge_name,user_name} = ""
-    await GetChallengeeName(id).then(res=>{
-        challenge_name= res.rows[0].challenge_name
+    let { challenge_name, user_name } = ""
+    await GetChallengeeName(id).then(res => {
+        challenge_name = res.rows[0].challenge_name
         user_name = res.rows[0].user_name
     })
     let message = "Your challenge on " + challenge_name + " has been started by " + user_name
-    await CreateNewNotficationsRow(id,message,challengee_user_id,challenger_user_id,"START");
-    await ConfirmingNotificationAction(id,"ACCEPT")
-    return res.json({"status":"challenge has been started"})
+    await CreateNewNotficationsRow(id, message, challengee_user_id, challenger_user_id, "START");
+    await ConfirmingNotificationAction(id, "ACCEPT")
+    return res.json({ "status": "challenge has been started" })
 })
 //Accepts, Starts and answers the challenge. This only happens when a challengee is accepting a challenge that was selected to be created now
-router.put("/AcceptStartAnswerChallenge", async function(req,res){
+router.put("/AcceptStartAnswerChallenge", async function (req, res) {
     const cred = global.credentials
-    const {challengeID,challengee_user_id,challenger_user_id,image_url,header} =req.body
+    const { challengeID, challengee_user_id, challenger_user_id, image_url, header } = req.body
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
     const query = `
         update challenges set status = 'On going', last_modified_date = NOW() WHERE id = $1
     `
-    const values=[challengeID]
+    const values = [challengeID]
     const result = await client.query(query, values)
     client.end();
-    let {challenge_name,user_name} = ""
-    await GetChallengeeName(challengeID).then(res=>{
-        challenge_name= res.rows[0].challenge_name
+    let { challenge_name, user_name } = ""
+    await GetChallengeeName(challengeID).then(res => {
+        challenge_name = res.rows[0].challenge_name
         user_name = res.rows[0].user_name
     })
     let message = "Your challenge on " + challenge_name + " has been started by " + user_name
-    await CreateNewNotficationsRow(challengeID,message,challengee_user_id,challenger_user_id,"START");
-    await ConfirmingNotificationAction(challengeID,"CREATE")
-    await InsertToStoryChallenges(challengeID,image_url,header)
-    return res.json({"status":"challenge has been started and answered"})
+    await CreateNewNotficationsRow(challengeID, message, challengee_user_id, challenger_user_id, "START");
+    await ConfirmingNotificationAction(challengeID, "CREATE")
+    await InsertToStoryChallenges(challengeID, image_url, header)
+    return res.json({ "status": "challenge has been started and answered" })
 
 })
-async function InsertToStoryChallenges(challenge_id,image_url,header){
+async function InsertToStoryChallenges(challenge_id, image_url, header) {
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
-    const query =  `
+    const query = `
     INSERT INTO story_challenges (challenge_id,image_url,header) VALUES ($1,$2,$3)
     `
-    let values = [challenge_id,image_url,header];    
+    let values = [challenge_id, image_url, header];
     const result = await client.query(query, values)
     client.end();
     return true;
 }
 //Challengee Declines the challenge. 
-router.delete("/DeclineChallenge", async function(req,res){
+router.delete("/DeclineChallenge", async function (req, res) {
     const cred = global.credentials
-    const {challengeID,challengee_user_id,challenger_user_id,image_url,header} =req.body
+    const { challengeID, challengee_user_id, challenger_user_id, image_url, header } = req.body
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
     await client.connect()
     const query = `
         update challenges set status = 'Declined', last_modified_date = NOW() WHERE id = $1
     `
-    const values=[challengeID]
+    const values = [challengeID]
     const result = await client.query(query, values)
     client.end();
-    let {challenge_name,user_name} = ""
-    await GetChallengeeName(challengeID).then(res=>{
-        challenge_name= res.rows[0].challenge_name
+    let { challenge_name, user_name } = ""
+    await GetChallengeeName(challengeID).then(res => {
+        challenge_name = res.rows[0].challenge_name
         user_name = res.rows[0].user_name
     })
     let message = "Your challenge on " + challenge_name + " has been Declined by " + user_name
-    await CreateNewNotficationsRow(challengeID,message,challengee_user_id,challenger_user_id,"Declined");
-    await ConfirmingNotificationAction(challengeID,"CREATE")
-    return res.json({"status":"challenge has been Declined"})
+    await CreateNewNotficationsRow(challengeID, message, challengee_user_id, challenger_user_id, "Declined");
+    await ConfirmingNotificationAction(challengeID, "CREATE")
+    return res.json({ "status": "challenge has been Declined" })
 })
 //Delete challenge
-router.delete("/DeleteChallengeByID/:challenge_id", async function(req,res){
+router.delete("/DeleteChallengeByID/:challenge_id", async function (req, res) {
     const challengeID = req.params.challenge_id
     const cred = global.credentials
     const client = new Client({ user: cred.user, host: cred.host, database: cred.database, password: cred.password, port: 5432 });
@@ -522,10 +524,10 @@ router.delete("/DeleteChallengeByID/:challenge_id", async function(req,res){
     const query = `
         Delete from challenges Where id = $1
     `
-    const values=[challengeID]
+    const values = [challengeID]
     const result = await client.query(query, values)
     client.end();
-    return res.json({"status":"Delete challenge"})
+    return res.json({ "status": "Delete challenge" })
 })
 
 module.exports = router
