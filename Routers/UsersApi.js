@@ -196,7 +196,7 @@ router.put("/changeUsesImageByUserId/:user_id", async function (req, res) {
     res.json({ "status": true })
 })
 router.get("/test", async function (req, res) {
-    res.json({ "status": "test" })
+
     /*TEST START */
 
     const pool = new Pool({
@@ -216,7 +216,7 @@ router.get("/test", async function (req, res) {
         console.error(err);
         res.send("Error " + err);
     }
-
+    res.json({ "status": "test" })
 })
 
 module.exports = router
