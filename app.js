@@ -5,7 +5,7 @@ const exphbs  = require('express-handlebars');
 const urlShortener = require('node-url-shortener');
 const bodyParser = require('body-parser');
 const moment = require('moment')
-const { Pool, Client } = require('pg')
+//const { Pool, Client } = require('pg')
 var os = require('os');
 var jwt = require('jwt-simple');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -64,7 +64,7 @@ router.get('/db', async (req, res) => {
 /*TEST END */
 
 
-
+/*
 //Here are the home routes
 app.use('/Users',users)
 app.use('/Friends',friends)
@@ -96,5 +96,5 @@ if(env == 'development'){
     "port":5432
   };
 
-}
+}*/
 app.listen(port, () => console.log(`url-shortener listening on port ${port}!`));
