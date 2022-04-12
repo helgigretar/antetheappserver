@@ -205,7 +205,7 @@ router.get("/test", async function (req, res) {
             rejectUnauthorized: false
         }
     });
-    console.log('here')
+    console.log('here',pool)
     try {
         const client = await pool.connect();
         const result = await client.query('SELECT * FROM test_table');
