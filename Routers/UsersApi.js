@@ -205,10 +205,10 @@ router.get("/test", async function (req, res) {
             rejectUnauthorized: false
         }
     });
-    console.log('here',pool)
     try {
         const client = await pool.connect();
         const result = await client.query('SELECT * FROM test_table');
+        console.log('result --> ',result)
         const results = { 'results': (result) ? result.rows : null };
         res.render('pages/db', results);
         client.release();
