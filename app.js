@@ -5,7 +5,7 @@ const exphbs  = require('express-handlebars');
 const urlShortener = require('node-url-shortener');
 const bodyParser = require('body-parser');
 const moment = require('moment')
-//const { Pool, Client } = require('pg')
+const { Client } = require('pg')
 var os = require('os');
 var jwt = require('jwt-simple');
 app.use(bodyParser.urlencoded({extended: true}));
