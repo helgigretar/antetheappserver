@@ -41,7 +41,6 @@ const corsOpts = {
 
 app.use(cors(corsOpts));
 
-
 //Here are the home routes
 app.use('/Users',users)
 app.use('/Friends',friends)
