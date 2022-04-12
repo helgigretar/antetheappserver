@@ -49,6 +49,7 @@ const pool = new Pool({
     rejectUnauthorized: false
   }
 });
+console.log(pool)
 router.get('/db', async (req, res) => {
     try {
       const client = await pool.connect();
