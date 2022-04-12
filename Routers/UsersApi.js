@@ -44,7 +44,7 @@ router.post('/userLogin', async function (req, res) {
     let values = [];
     values.push(user_name) //Name = 1
     values.push(password) // password =2
-    console.log(user_name,password)
+    console.log(user_name, password)
     const result = await client.query(query, values)
     client.end();
     let authStatus = false;
@@ -52,12 +52,12 @@ router.post('/userLogin', async function (req, res) {
     if (data.length === 1) {
         data.authStatus = false;
         const user = {
-            "id":data[0].id,"name":data[0].name,"user_name":data[0].password, "email":data[0].email,"country":data[0].country,"age":data[0].age,
-            "image_url":data[0].image_url,"description":data[0].description,"gender":data[0].gender
+            "id": data[0].id, "name": data[0].name, "user_name": data[0].password, "email": data[0].email, "country": data[0].country, "age": data[0].age,
+            "image_url": data[0].image_url, "description": data[0].description, "gender": data[0].gender
         }
         return res.json({ "data": user, "status": true })
     } else {
-        return res.json({ "status": false,message:"incorrect credentials" })
+        return res.json({ "status": false, message: "incorrect credentials" })
     }
 })
 
@@ -115,7 +115,7 @@ router.get("/getUserByUserId/:user_id", async function (req, res) {
     await GetUsersRankingByUserID(user_id).then(res => {
         user.ranking = res;
     })
-    return res.json({ "data": user,status:true, message:"user information" })
+    return res.json({ "data": user, status: true, message: "user information" })
 })
 //status:true, message:"Return user information" 
 //Get user information by its user_id
@@ -197,6 +197,26 @@ router.put("/changeUsesImageByUserId/:user_id", async function (req, res) {
 })
 router.get("/test", async function (req, res) {
     res.json({ "status": "test" })
+    /*TEST START */
+
+    const pool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+            rejectUnauthorized: false
+        }
+    });
+    console.log('here')
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT * FROM test_table');
+        const results = { 'results': (result) ? result.rows : null };
+        res.render('pages/db', results);
+        client.release();
+    } catch (err) {
+        console.error(err);
+        res.send("Error " + err);
+    }
+
 })
 
 module.exports = router

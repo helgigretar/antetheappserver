@@ -5,7 +5,7 @@ const exphbs  = require('express-handlebars');
 const urlShortener = require('node-url-shortener');
 const bodyParser = require('body-parser');
 const moment = require('moment')
-const { Client } = require('pg')
+const { Pool, Client } = require('pg')
 var os = require('os');
 var jwt = require('jwt-simple');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -24,7 +24,7 @@ const underChallenges = require('./Routers/UnderChallengesApi')
 const notifications = require('./Routers/NotificationsApi');
 var cors = require('cors');
 const { table } = require('console');
-var router = express.Router()
+
 
 const corsOpts = {
   origin: '*',
@@ -41,31 +41,7 @@ const corsOpts = {
 
 app.use(cors(corsOpts));
 
-/*TEST START */
-const { Pool } = require('pg');
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
-console.log(pool)
-router.get('/db', async (req, res) => {
-    try {
-      const client = await pool.connect();
-      const result = await client.query('SELECT * FROM test_table');
-      const results = { 'results': (result) ? result.rows : null};
-      res.render('pages/db', results );
-      client.release();
-    } catch (err) {
-      console.error(err);
-      res.send("Error " + err);
-    }
-  })
-/*TEST END */
 
-
-/*
 //Here are the home routes
 app.use('/Users',users)
 app.use('/Friends',friends)
@@ -97,5 +73,5 @@ if(env == 'development'){
     "port":5432
   };
 
-}*/
+}
 app.listen(port, () => console.log(`url-shortener listening on port ${port}!`));
