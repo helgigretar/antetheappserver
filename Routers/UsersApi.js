@@ -200,11 +200,16 @@ router.get("/test", async function (req, res) {
     /*TEST START */
 
     const pool = new Pool({
-        connectionString: process.env.DATABASE_URL,
+        user:"wbtykjisrzwzhn",
+        host:"ec2-34-207-12-160.compute-1.amazonaws.com",
+        database:"d9sjkqpnublu4r",
+        password:"7b2a713cdbf06ce9af6b02cf5328bec75382db554a24c8e67ced48afe89fc1bf",
+        port:5432,
+       // connectionString: process.env.DATABASE_URL,
         ssl: {
-            rejectUnauthorized: false
+          rejectUnauthorized: false
         }
-    });
+      });
     try {
         const client = await pool.connect();
         const result = await client.query('SELECT * FROM test_table');
